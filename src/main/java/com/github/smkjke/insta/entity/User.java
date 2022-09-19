@@ -34,8 +34,7 @@ public class User {
     }
 
     @ElementCollection(targetClass = ERole.class) // dependency User = Role; one to many
-    @CollectionTable(name = "user_role",
-            joinColumns = @JoinColumn("user_id"))
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     private Set<ERole> roleSet = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
@@ -45,6 +44,7 @@ public class User {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
+    @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
     /**
