@@ -14,7 +14,7 @@ import java.io.IOException;
 
 //catch autorization error and return 401
 @Component
-public class JWTAuthentificationEntryPoint implements AuthenticationEntryPoint{
+public class JWTAuthentificationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         InvalidLoginResponce loginResponce = new InvalidLoginResponce();
