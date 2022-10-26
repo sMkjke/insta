@@ -2,6 +2,7 @@ package com.github.smkjke.insta.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.smkjke.insta.entity.enums.ERole;
+
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,49 +11,34 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Data
 @Entity
+@Data
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(nullable = false)
     private String name;
     @Column(unique = true, updatable = false)
-    private String userName;
-    @Column(unique = true, updatable = false)
-    private String lastName;
+    private String username;
+    @Column(nullable = false)
+    private String lastname;
     @Column(unique = true)
     private String email;
-    @Column(columnDefinition = "text") // to save more than 50 symbols in bio;
+    @Column(columnDefinition = "text")
     private String bio;
     @Column(length = 3000)
     private String password;
 
-    public User() {
-
-    }
-
-    public User(long id,
-                String userName,
-                String email,
-                String password,
-                Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-    @ElementCollection(targetClass = ERole.class) // dependency User = Role; one to many
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    private Set<ERole> roleSet = new HashSet<>();
+    @ElementCollection(targetClass = ERole.class)
+    @CollectionTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"))
+    private Set<ERole> roles = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
-    // CascadeType.All - when we delete User -> all posts will be deleted too, FetchType.Lazy = if we enter into User, we dont need to get all user posts
-    private List<Post> postList = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
+
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     @Column(updatable = false)
     private LocalDateTime createdDate;
@@ -60,24 +46,31 @@ public class User implements UserDetails {
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
-    /**
-     * On create. Track when was create that or another object in DB.
-     * if we create a new entity and call the save method of our repository,
-     * our method annotated with @PrePersist is called, then the record is inserted into the database
-     */
+    public User() {
+    }
+
+    public User(Long id,
+                String username,
+                String email,
+                String password,
+                Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.authorities = authorities;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
     }
 
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
     /**
-     * Security
+     * SECURITY
      */
+
+
 
     @Override
     public String getPassword() {
@@ -104,3 +97,4 @@ public class User implements UserDetails {
         return true;
     }
 }
+

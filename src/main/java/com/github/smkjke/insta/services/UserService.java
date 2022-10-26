@@ -26,10 +26,10 @@ public class UserService {
         User user = new User();
         user.setEmail(userIn.getEmail());
         user.setName(userIn.getFirstname());
-        user.setLastName(userIn.getLastname());
-        user.setUserName(userIn.getUsername());
+        user.setLastname(userIn.getLastname());
+        user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
-        user.getRoleSet().add(ERole.ROLE_USER);
+        user.getRoles().add(ERole.ROLE_USER);
 
         try {
             LOG.info("Saving user {}", userIn.getEmail());

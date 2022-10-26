@@ -19,14 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 
-public class JWTAuthentificationFilter extends OncePerRequestFilter {
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
+    public static final Logger LOG = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
-    public static final Logger LOG = LoggerFactory.getLogger(JWTAuthentificationFilter.class);
     @Autowired
     private JWTTokenProvider jwtTokenProvider;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -36,24 +35,27 @@ public class JWTAuthentificationFilter extends OncePerRequestFilter {
                 Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
                 User userDetails = customUserDetailsService.loadUserById(userId);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails
-                        , null
-                        , Collections.emptyList());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, Collections.emptyList()
+                );
+
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));;
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e) {
-            LOG.error("Could not set user authenticiation");
+        } catch (Exception ex) {
+            LOG.error("Could not set user authentication");
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
     private String getJWTFromRequest(HttpServletRequest request) {
-        String bearToken = request.getHeader(SecurityConstansts.HEADER_STRING);
-        if (StringUtils.hasText(bearToken) && bearToken.startsWith(SecurityConstansts.TOKEN_PREFIX)) {
+        String bearToken = request.getHeader(SecurityConstants.HEADER_STRING);
+        if (StringUtils.hasText(bearToken) && bearToken.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             return bearToken.split(" ")[1];
         }
         return null;
     }
+
+
 }

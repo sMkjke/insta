@@ -3,10 +3,10 @@ package com.github.smkjke.insta.web;
 
 import com.github.smkjke.insta.payload.request.LoginRequest;
 import com.github.smkjke.insta.payload.request.SignupRequest;
-import com.github.smkjke.insta.payload.responce.JWTTokenSuccessResponce;
+import com.github.smkjke.insta.payload.responce.JWTTokenSuccessResponse;
 import com.github.smkjke.insta.payload.responce.MessageResponse;
 import com.github.smkjke.insta.security.JWTTokenProvider;
-import com.github.smkjke.insta.security.SecurityConstansts;
+import com.github.smkjke.insta.security.SecurityConstants;
 import com.github.smkjke.insta.services.UserService;
 import com.github.smkjke.insta.validations.ResponseErrorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+
 @CrossOrigin
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
 public class AuthController {
 
@@ -40,24 +41,27 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (ObjectUtils.isEmpty(errors)) return errors;
+        if (!ObjectUtils.isEmpty(errors)) return errors;
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(),
                 loginRequest.getPassword()
         ));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = SecurityConstansts.TOKEN_PREFIX = jwtTokenProvider.generateToken(authentication);
-         return ResponseEntity.ok(new JWTTokenSuccessResponce(true, jwt));
+        String jwt = SecurityConstants.TOKEN_PREFIX + jwtTokenProvider.generateToken(authentication);
+
+        return ResponseEntity.ok(new JWTTokenSuccessResponse(true, jwt));
     }
 
-    @PostMapping("/signup") //api/auth/signup
+
+    @PostMapping("/signup")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signupRequest, BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (ObjectUtils.isEmpty(errors)) return errors;
+        if (!ObjectUtils.isEmpty(errors)) return errors;
 
         userService.createUser(signupRequest);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
 }

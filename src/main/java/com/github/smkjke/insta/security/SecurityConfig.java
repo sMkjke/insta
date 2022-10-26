@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //all url that will come to URL api/auth/** and others after it - allow to all to that api,
                 //other urls should be autorized
                 .authorizeRequests()
-                .antMatchers(SecurityConstansts.SIGN_UP_URLS).permitAll()
+                .antMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthentificationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JWTAuthentificationFilter jwtAuthentificationFilter() {
-        return new JWTAuthentificationFilter();
+    public JWTAuthenticationFilter jwtAuthentificationFilter() {
+        return new JWTAuthenticationFilter();
     }
 }
